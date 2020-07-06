@@ -509,11 +509,14 @@ static int exfat_add_entry(struct inode *inode, const char *path,
 	unsigned int start_clu = EXFAT_FREE_CLUSTER;
 
 	ret = exfat_resolve_path(inode, path, p_dir, &uniname);
-	if (ret)
+	if (ret) {
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 		goto out;
+	}
 
 	num_entries = exfat_calc_num_entries(&uniname);
 	if (num_entries < 0) {
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 		ret = num_entries;
 		goto out;
 	}
@@ -522,13 +525,16 @@ static int exfat_add_entry(struct inode *inode, const char *path,
 	dentry = exfat_find_empty_entry(inode, p_dir, num_entries);
 	if (dentry < 0) {
 		ret = dentry; /* -EIO or -ENOSPC */
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 		goto out;
 	}
 
 	if (type == TYPE_DIR) {
 		ret = exfat_alloc_new_dir(inode, &clu);
-		if (ret)
+		if (ret) {
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 			goto out;
+		}
 		start_clu = clu.dir;
 		clu_size = sbi->cluster_size;
 	}
@@ -539,13 +545,15 @@ static int exfat_add_entry(struct inode *inode, const char *path,
 	 */
 	ret = exfat_init_dir_entry(inode, p_dir, dentry, type,
 		start_clu, clu_size);
-	if (ret)
+	if (ret) {
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 		goto out;
-
+	}
 	ret = exfat_init_ext_entry(inode, p_dir, dentry, num_entries, &uniname);
-	if (ret)
+	if (ret) {
+		pr_err("exfat_add_entry : %d, ret : %d\n", __LINE__, ret);
 		goto out;
-
+	}
 	memcpy(&info->dir, p_dir, sizeof(struct exfat_chain));
 	info->entry = dentry;
 	info->flags = ALLOC_NO_FAT_CHAIN;
@@ -593,9 +601,10 @@ static int exfat_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 	err = exfat_add_entry(dir, dentry->d_name.name, &cdir, TYPE_FILE,
 		&info);
 	exfat_set_vol_flags(sb, VOL_CLEAN);
-	if (err)
+	if (err) {
+		pr_err("exfat_create err : %d\n", err);
 		goto unlock;
-
+	}
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 	inode_inc_iversion(dir);
 #else

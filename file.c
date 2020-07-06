@@ -76,23 +76,29 @@ static int exfat_sanitize_mode(const struct exfat_sb_info *sbi,
 	perm = *mode_ptr & ~(S_IFMT | mask);
 
 	/* Of the r and x bits, all (subject to umask) must be present.*/
-	if ((perm & 0555) != (i_mode & 0555))
+	if ((perm & 0555) != (i_mode & 0555)) {
+		pr_err("1 exfat_sanitize_mode -EPERM\n");
 		return -EPERM;
+	}
 
 	if (exfat_mode_can_hold_ro(inode)) {
 		/*
 		 * Of the w bits, either all (subject to umask) or none must
 		 * be present.
 		 */
-		if ((perm & 0222) && ((perm & 0222) != (0222 & ~mask)))
+		if ((perm & 0222) && ((perm & 0222) != (0222 & ~mask))) {
+		pr_err("2 exfat_sanitize_mode -EPERM\n");
 			return -EPERM;
+		}
 	} else {
 		/*
 		 * If exfat_mode_can_hold_ro(inode) is false, can't change
 		 * w bits.
 		 */
-		if ((perm & 0222) != (0222 & ~mask))
+		if ((perm & 0222) != (0222 & ~mask)) {
+		pr_err("3 exfat_sanitize_mode -EPERM\n");
 			return -EPERM;
+		}
 	}
 
 	*mode_ptr &= S_IFMT | perm;
@@ -112,8 +118,10 @@ int __exfat_truncate(struct inode *inode, loff_t new_size)
 	int evict = (ei->dir.dir == DIR_DELETED) ? 1 : 0;
 
 	/* check if the given file ID is opened */
-	if (ei->type != TYPE_FILE && ei->type != TYPE_DIR)
+	if (ei->type != TYPE_FILE && ei->type != TYPE_DIR) {
+		pr_err("__exfat_truncate -EPERM\n");
 		return -EPERM;
+	}
 
 	exfat_set_vol_flags(sb, VOL_DIRTY);
 
@@ -357,6 +365,7 @@ int exfat_setattr(struct dentry *dentry, struct iattr *attr)
 	     !gid_eq(attr->ia_gid, sbi->options.fs_gid)) ||
 	    ((attr->ia_valid & ATTR_MODE) &&
 	     (attr->ia_mode & ~(S_IFREG | S_IFLNK | S_IFDIR | 0777)))) {
+		pr_err("exfat_setattr -EPERM\n");
 		error = -EPERM;
 		goto out;
 	}

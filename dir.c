@@ -75,8 +75,10 @@ static int exfat_readdir(struct inode *inode, struct exfat_dir_entry *dir_entry)
 	struct buffer_head *bh;
 
 	/* check if the given file ID is opened */
-	if (ei->type != TYPE_DIR)
+	if (ei->type != TYPE_DIR) {
+		pr_err("exfat_readdir -EPERM\n");
 		return -EPERM;
+	}
 
 	if (ei->entry == -1)
 		exfat_chain_set(&dir, sbi->root_dir, 0, ALLOC_FAT_CHAIN);
