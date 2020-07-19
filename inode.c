@@ -47,8 +47,8 @@ static int __exfat_write_inode(struct inode *inode, int sync)
 	es = exfat_get_dentry_set(sb, &(ei->dir), ei->entry, ES_ALL_ENTRIES);
 	if (!es)
 		return -EIO;
-	ep = exfat_get_dentry_cached(es, 0);
-	ep2 = exfat_get_dentry_cached(es, 1);
+	ep = exfat_get_validated_dentry(es, 0, TYPE_FILE);
+	ep2 = exfat_get_validated_dentry(es, 1, TYPE_STREAM);
 
 	ep->dentry.file.attr = cpu_to_le16(exfat_make_attr(inode));
 
@@ -230,7 +230,7 @@ static int exfat_map_cluster(struct inode *inode, unsigned int clu_offset,
 			if (!es)
 				return -EIO;
 			/* get stream entry */
-			ep = exfat_get_dentry_cached(es, 1);
+			ep = exfat_get_validated_dentry(es, 1, TYPE_STREAM);
 
 			/* update directory entry */
 			ep->dentry.stream.flags = ei->flags;

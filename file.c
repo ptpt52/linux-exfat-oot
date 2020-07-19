@@ -173,8 +173,8 @@ int __exfat_truncate(struct inode *inode, loff_t new_size)
 				ES_ALL_ENTRIES);
 		if (!es)
 			return -EIO;
-		ep = exfat_get_dentry_cached(es, 0);
-		ep2 = exfat_get_dentry_cached(es, 1);
+		ep = exfat_get_validated_dentry(es, 0, TYPE_FILE);
+		ep2 = exfat_get_validated_dentry(es, 1, TYPE_STREAM);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
 		ts = current_time(inode);

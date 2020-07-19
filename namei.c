@@ -717,8 +717,8 @@ static int exfat_find(struct inode *dir, struct qstr *qname,
 		es = exfat_get_dentry_set(sb, &cdir, dentry, ES_2_ENTRIES);
 		if (!es)
 			return -EIO;
-		ep = exfat_get_dentry_cached(es, 0);
-		ep2 = exfat_get_dentry_cached(es, 1);
+		ep = exfat_get_validated_dentry(es, 0, TYPE_FILE);
+		ep2 = exfat_get_validated_dentry(es, 1, TYPE_STREAM);
 
 		info->type = exfat_get_entry_type(ep);
 		info->attr = le16_to_cpu(ep->dentry.file.attr);
