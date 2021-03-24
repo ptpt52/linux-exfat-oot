@@ -1046,7 +1046,6 @@ static int exfat_init_fs_context(struct fs_context *fc)
 		return -ENOMEM;
 
 	mutex_init(&sbi->s_lock);
-	mutex_init(&sbi->bitmap_lock);
 	ratelimit_state_init(&sbi->ratelimit, DEFAULT_RATELIMIT_INTERVAL,
 			DEFAULT_RATELIMIT_BURST);
 
