@@ -425,7 +425,6 @@ int exfat_set_bitmap(struct inode *inode, unsigned int clu, bool sync);
 void exfat_clear_bitmap(struct inode *inode, unsigned int clu, bool sync);
 unsigned int exfat_find_free_bitmap(struct super_block *sb, unsigned int clu);
 int exfat_count_used_clusters(struct super_block *sb, unsigned int *ret_count);
-int exfat_trim_fs(struct inode *inode, struct fstrim_range *range);
 
 /* file.c */
 extern const struct file_operations exfat_file_operations;
@@ -449,9 +448,6 @@ int exfat_getattr(struct vfsmount *mnt, struct dentry *dentry,
 #endif
 #endif
 int exfat_file_fsync(struct file *file, loff_t start, loff_t end, int datasync);
-long exfat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
-long exfat_compat_ioctl(struct file *filp, unsigned int cmd,
-				unsigned long arg);
 
 
 /* namei.c */
